@@ -13,6 +13,8 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "@leafygreen-ui/button": "^20.0.1",
+    "@leafygreen-ui/typography": "^16.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.8.2"
