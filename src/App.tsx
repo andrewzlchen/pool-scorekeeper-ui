@@ -3,8 +3,8 @@ import {
   RouterProvider,
 } from "react-router-dom";
 
-import Layout from './common/layout/Layout'
-import Auth from './pages/auth/Auth'
+import Layout from './common/layout'
+import Auth from './pages/auth'
 import './App.css'
 
 function App() {
@@ -26,17 +26,6 @@ const router = createBrowserRouter([
 
   return (
     <div className="App">
-      <h1>tablerunner</h1>
-
-      <a href="/">
-        <button>Home</button>
-      </a>
-      <a href="/login">
-        <button>Log in</button>
-      </a>
-      <a href="/signup">
-        <button>Sign up</button>
-      </a>
 
       <Layout>
         <RouterProvider router={router} />

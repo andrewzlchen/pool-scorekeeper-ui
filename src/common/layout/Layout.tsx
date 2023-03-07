@@ -4,7 +4,19 @@ const Layout = ({children}: PropsWithChildren ) => {
 
     return (
         <div className="auth-page">
-            <h1>Layout</h1>
+            <nav>
+      <h1>tablerunner</h1>
+
+      <a href="/">
+        <button>Home</button>
+      </a>
+      <a href="/login">
+        <button>Log in</button>
+      </a>
+      <a href="/signup">
+        <button>Sign up</button>
+      </a>
+            </nav>
             {children}
         </div>
     )
