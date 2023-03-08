@@ -4,7 +4,7 @@ import Layout from "./common/layout";
 import Auth from "./pages/auth";
 import Home from "./pages/home";
 import GameSettings from "./pages/game-settings";
-import Game from "./pages/game";
+import Game, { GameType } from "./pages/game";
 import { RealmAppProvider } from "./hooks/useRealmApp";
 import appConfig from "../realm.json";
 import "./App.css";
@@ -27,7 +27,13 @@ function App() {
     },
     {
       path: "/matches/:matchid/games/:gameid/scorekeeper",
-      element: <Game />,
+      element: (
+        <Game
+          gameType={GameType.EightBall}
+          playerA={{ name: "eren" }}
+          playerB={{ name: "armin" }}
+        />
+      ),
     },
     {
       path: "/matches/:matchid/games/:gameid/players",
