@@ -5,7 +5,11 @@ import Auth from "./pages/auth";
 import Home from "./pages/home";
 import GameSettings from "./pages/game-settings";
 import Game from "./pages/game";
+import { RealmAppProvider } from "./hooks/useRealmApp";
+import appConfig from "../realm.json";
 import "./App.css";
+
+const { appId } = appConfig;
 
 function App() {
   const router = createBrowserRouter([
@@ -32,11 +36,13 @@ function App() {
   ]);
 
   return (
-    <div className="App">
-      <Layout>
-        <RouterProvider router={router} />
-      </Layout>
-    </div>
+    <RealmAppProvider appId={appId}>
+      <div className="App">
+        <Layout>
+          <RouterProvider router={router} />
+        </Layout>
+      </div>
+    </RealmAppProvider>
   );
 }
 
