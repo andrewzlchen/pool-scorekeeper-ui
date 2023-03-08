@@ -1,8 +1,7 @@
 import React from "react";
-import { H1 } from "@leafygreen-ui/typography";
 
 const HomePage = () => {
-  return <H1>Hme</H1>;
+  return <h1>Hme</h1>;
 };
 
 export default HomePage;
