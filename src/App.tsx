@@ -19,7 +19,7 @@ function App() {
     },
     {
       path: "/login",
-      element: <Auth login />,
+      element: <Auth isLogin />,
     },
     {
       path: "/signup",

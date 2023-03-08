@@ -9,7 +9,7 @@ import appConfig from "../../realm.json";
 
 const { baseUrl } = appConfig;
 
-function createRealmApp(id: any) {
+function createRealmApp(id: any): any {
   return new Realm.App({ id, baseUrl });
 }
 
@@ -23,6 +23,7 @@ interface RealmAppProviderProps {
 export function RealmAppProvider({ appId, children }: RealmAppProviderProps) {
   // Store Realm.App in React state. If appId changes, all children will rerender and use the new realmApp.
   const [realmApp, setRealmApp] = React.useState(createRealmApp(appId));
+
   React.useEffect(() => {
     setRealmApp(createRealmApp(appId));
   }, [appId]);
