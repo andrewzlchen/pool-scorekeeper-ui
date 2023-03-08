@@ -10,7 +10,6 @@ const AuthPage= ({ login }: OwnProps ) => {
             <h1>{login ? 'Log in' : "Sign up"}</h1>
         </div>
     )
-
 }
 
 export default AuthPage
