@@ -8,7 +8,7 @@ const MatchContext = React.createContext<{
   setMatch: (match: SinglesMatch) => void;
 } | null>(null);
 
-const MatchContextProvider = ({ children }: PropsWithChildren) => {
+export const MatchContextProvider = ({ children }: PropsWithChildren) => {
   const [match, setMatch] = React.useState<SinglesMatch>();
 
   return (

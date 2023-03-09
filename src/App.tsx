@@ -4,9 +4,10 @@ import Layout from "./common/layout";
 import Auth from "./pages/auth";
 import Home from "./pages/home";
 import GameSettings from "./pages/game-settings";
-import Game, { GameType } from "./pages/game";
+import Game from "./pages/game";
 import { RealmAppProvider } from "./hooks/useRealmApp";
 import { MatchContextProvider } from "./hooks/useMatch";
+import { GameType } from "./common/types";
 import appConfig from "../realm.json";
 import "./App.css";
 

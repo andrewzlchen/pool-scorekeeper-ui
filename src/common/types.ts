@@ -17,7 +17,7 @@ export interface GameState {
   player: Player;
 }
 
-type Player = {
+export type Player = {
   id: string;
   name: string;
 };
@@ -27,19 +27,14 @@ export enum GameType {
   NineBall = 9,
 }
 
-interface GameSettings {
+export interface GameSettings {
   gameType: GameType;
   playerA: Player;
   playerB: Player;
 }
 
-enum Action {
+export enum Action {
   Safety = "safety",
   Scratch = "scratch",
   Turnover = "turnover",
-}
-
-interface Props {
-  matchId: string;
-  gameSettings: GameSettings;
 }

@@ -1,1 +1,1 @@
-export { default, GameType } from "./Game";
+export { default } from "./Game";

@@ -1,30 +1,9 @@
 import React from "react";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import styled from "@emotion/styled";
+import { Action, GameSettings, GameType } from "../../common/types";
 
 import PoolBall from "./poolball";
-
-type Player = {
-  id: string;
-  name: string;
-};
-
-export enum GameType {
-  EightBall = 8,
-  NineBall = 9,
-}
-
-interface GameSettings {
-  gameType: GameType;
-  playerA: Player;
-  playerB: Player;
-}
-
-enum Action {
-  Safety = "safety",
-  Scratch = "scratch",
-  Turnover = "turnover",
-}
 
 interface Props {
   matchId: string;
@@ -166,7 +145,7 @@ const GamePage = ({
           onClick={() => {
             setInning(inning + 1);
             setNumScratches(numScratches + 1);
-            pushGameState(Action.Scratch, false);
+            pushGameState(Action.Scratch);
           }}
         >
           Scratch
@@ -176,7 +155,7 @@ const GamePage = ({
           onClick={() => {
             setInning(inning + 1);
             setNumSafeties(numSafeties + 1);
-            pushGameState(Action.Safety, false);
+            pushGameState(Action.Safety);
           }}
         >
           Safety
