@@ -1,7 +1,7 @@
 import React from "react";
 import { PropsWithChildren } from "react";
 
-import { SinglesMatch } from "../common/types";
+import { GameType, SinglesMatch } from "../common/types";
 
 const MatchContext = React.createContext<{
   match?: SinglesMatch;
@@ -9,7 +9,21 @@ const MatchContext = React.createContext<{
 } | null>(null);
 
 export const MatchContextProvider = ({ children }: PropsWithChildren) => {
-  const [match, setMatch] = React.useState<SinglesMatch>();
+  const [match, setMatch] = React.useState<SinglesMatch>({
+    id: "testId",
+    settings: {
+      gameType: GameType.EightBall,
+      playerA: {
+        id: "testPlayerA",
+        name: "test player a",
+      },
+      playerB: {
+        id: "testPlayerB",
+        name: "test player b",
+      },
+    },
+    games: [],
+  });
 
   return (
     <MatchContext.Provider value={{ match, setMatch }}>
@@ -19,11 +33,13 @@ export const MatchContextProvider = ({ children }: PropsWithChildren) => {
 };
 
 const useMatch = () => {
-  const match = React.useContext(MatchContext);
-  if (match) {
-    return [match, ""];
+  const matchCtx = React.useContext(MatchContext);
+  if (!matchCtx) {
+    throw new Error(
+      "cannot use useMatch unless inside of match context provider"
+    );
   }
-  return [undefined, "no match found"];
+  return matchCtx;
 };
 
 export default useMatch;

@@ -10,6 +10,8 @@ import { MatchContextProvider } from "./hooks/useMatch";
 import { GameType } from "./common/types";
 import appConfig from "../realm.json";
 import "./App.css";
+import MatchGames from "./pages/match-games/MatchGames";
+import Matches from "./pages/matches/Matches";
 
 const { appId } = appConfig;
 
@@ -28,7 +30,41 @@ function App() {
       element: <Auth />,
     },
     {
-      path: "/matches/:matchid/games/:gameid/scorekeeper",
+      path: "/matches",
+      element: <Matches />,
+    },
+    {
+      path: "/matches/:matchid/games",
+      element: <MatchGames />,
+    },
+    {
+      path: "/matches/:matchid/games/:gameid/settings",
+      element: (
+        <MatchContextProvider>
+          <GameSettings
+            date={"10/10/2021"}
+            teamA={{
+              id: "1",
+              name: "Team A",
+              players: [
+                { id: "1", name: "Kool-aid Man" },
+                { id: "2", name: "Capn' Crunch" },
+              ],
+            }}
+            teamB={{
+              id: "2",
+              name: "Team B",
+              players: [
+                { id: "100", name: "John Doe" },
+                { id: "101", name: "Jane Doe" },
+              ],
+            }}
+          />
+        </MatchContextProvider>
+      ),
+    },
+    {
+      path: "/matches/:matchid/games/:gameid",
       element: (
         <MatchContextProvider>
           <Game
@@ -39,14 +75,6 @@ function App() {
               playerB: { id: "2", name: "armin" },
             }}
           />
-        </MatchContextProvider>
-      ),
-    },
-    {
-      path: "/matches/:matchid/games/:gameid/players",
-      element: (
-        <MatchContextProvider>
-          <GameSettings />
         </MatchContextProvider>
       ),
     },

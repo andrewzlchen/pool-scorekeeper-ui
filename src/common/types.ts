@@ -5,7 +5,8 @@ export interface TeamMatch {
 
 export interface SinglesMatch {
   id: string;
-  racks: Game[];
+  settings: GameSettings;
+  games: Game[];
 }
 
 export interface Game {
@@ -17,14 +18,20 @@ export interface GameState {
   player: Player;
 }
 
-export type Player = {
+export interface Team {
   id: string;
   name: string;
-};
+  players: Player[];
+}
+
+export interface Player {
+  id: string;
+  name: string;
+}
 
 export enum GameType {
-  EightBall = 8,
-  NineBall = 9,
+  EightBall = "8ball",
+  NineBall = "9ball",
 }
 
 export interface GameSettings {
