@@ -28,7 +28,7 @@ const BallOuter = styled.div`
   background-color: ${(props) => props.color};
 `;
 
-const BallInnerSolid = styled.div`
+const BallNumber = styled.div`
   width: 40px;
   height: 40px;
   border-radius: 40px;
@@ -38,6 +38,7 @@ const BallInnerSolid = styled.div`
   background-color: white;
   color: black;
   border: black 2px solid;
+  text-align: center;
 `;
 
 const BallInnerStripes = styled.div`
@@ -63,10 +64,10 @@ const PoolBall = ({ num, potted, onClick }: Props) => {
       className="poolball"
       color={colors[(num - 1) % 8]}
     >
-      {num <= 8 && <BallInnerSolid>{potted ? "x" : num}</BallInnerSolid>}
+      {num <= 8 && <BallNumber>{potted ? "x" : num}</BallNumber>}
       {num > 8 && (
         <BallInnerStripes>
-          <BallInnerSolid>{potted ? "x" : num}</BallInnerSolid>
+          <BallNumber>{potted ? "x" : num}</BallNumber>
         </BallInnerStripes>
       )}
     </BallOuter>

@@ -31,7 +31,7 @@ export function RealmAppProvider({ appId, children }: RealmAppProviderProps) {
   const [currentUser, setCurrentUser] = React.useState(realmApp.currentUser);
   // Wrap the base logIn function to save the logged in user in state
   const logIn = React.useCallback(
-    async (credentials: Realm.Credentials<{ [x: string]: unknown; }>) => {
+    async (credentials: Realm.Credentials<{ [x: string]: unknown }>) => {
       await realmApp.logIn(credentials);
       setCurrentUser(realmApp.currentUser);
     },

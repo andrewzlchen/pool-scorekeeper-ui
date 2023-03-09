@@ -2,25 +2,20 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import Layout from "./common/layout";
 import Auth from "./pages/auth";
-import Home from "./pages/home";
-import GameSettings from "./pages/game-settings";
 import Game from "./pages/game";
 import { RealmAppProvider } from "./hooks/useRealmApp";
 import { MatchContextProvider } from "./hooks/useMatch";
 import { GameType } from "./common/types";
 import appConfig from "../realm.json";
-import "./App.css";
 import MatchGames from "./pages/match-games/MatchGames";
 import Matches from "./pages/matches/Matches";
+
+import "./App.css";
 
 const { appId } = appConfig;
 
 function App() {
   const router = createBrowserRouter([
-    {
-      path: "/",
-      element: <Home />,
-    },
     {
       path: "/login",
       element: <Auth isLogin />,
@@ -35,31 +30,9 @@ function App() {
     },
     {
       path: "/matches/:matchid/games",
-      element: <MatchGames />,
-    },
-    {
-      path: "/matches/:matchid/games/:gameid/settings",
       element: (
         <MatchContextProvider>
-          <GameSettings
-            date={"10/10/2021"}
-            teamA={{
-              id: "1",
-              name: "Team A",
-              players: [
-                { id: "1", name: "Kool-aid Man" },
-                { id: "2", name: "Capn' Crunch" },
-              ],
-            }}
-            teamB={{
-              id: "2",
-              name: "Team B",
-              players: [
-                { id: "100", name: "John Doe" },
-                { id: "101", name: "Jane Doe" },
-              ],
-            }}
-          />
+          <MatchGames />
         </MatchContextProvider>
       ),
     },

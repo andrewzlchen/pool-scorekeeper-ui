@@ -1,9 +1,9 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-import { GameType, Player, Team, SinglesMatch } from "../../common/types";
-import urls from "../../common/urls";
-import useMatch from "../../hooks/useMatch";
+import { GameType, Player, Team, SinglesMatch } from "../../../common/types";
+import urls from "../../../common/urls";
+import useMatch from "../../../hooks/useMatch";
 
 interface Props {
   teamA: Team;
