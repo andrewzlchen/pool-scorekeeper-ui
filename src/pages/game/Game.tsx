@@ -1,9 +1,11 @@
 import React from "react";
+import axios, { AxiosError } from "axios";
 import styled from "@emotion/styled";
 
 import PoolBall from "./poolball";
 
 type Player = {
+  id: string;
   name: string;
 };
 
@@ -12,10 +14,21 @@ export enum GameType {
   NineBall = 9,
 }
 
-interface Props {
+interface GameSettings {
   gameType: GameType;
   playerA: Player;
   playerB: Player;
+}
+
+enum Action {
+  Safety = "safety",
+  Scratch = "scratch",
+  Turnover = "turnover",
+}
+
+interface Props {
+  matchId: string;
+  gameSettings: GameSettings;
 }
 
 const BallsContainer = styled.div`
@@ -28,12 +41,78 @@ const BallsContainer = styled.div`
   row-gap: 25px;
 `;
 
-const GamePage = ({ playerA, playerB, gameType }: Props) => {
+const GamePage = ({
+  gameSettings: { playerA, playerB, gameType },
+  matchId,
+}: Props) => {
   const [inning, setInning] = React.useState(0);
+  const [currPlayer, setCurrPlayer] = React.useState(playerA);
   const [numScratches, setNumScratches] = React.useState(0);
   const [numSafeties, setNumSafeties] = React.useState(0);
   const [balls, setBalls] = React.useState<boolean[]>([]);
+  const [err, setErr] = React.useState("");
+  const [isGameOver, setIsGameOver] = React.useState(false);
 
+  // push the state of the game as of the end of the previous turn. should be called upon ending the turn
+  const pushGameState = async (action: Action) => {
+    const endpointUrl =
+      "https://data.mongodb-api.com/app/table-runner-qzkyp/endpoint/game_state/push";
+
+    // game over conditions:
+    // 1. 8-ball, scratch on 8
+    // 2. 8-ball, prematurely potting the 8
+    // 3. 8-ball, potting the 8
+    // 3. 9-ball, potting the 9
+
+    if (gameType === GameType.EightBall) {
+      const didPotEight = balls[7];
+      const oneThruSevenPotted = balls.slice(0, 8).every((potted) => potted);
+
+      // loss conditions
+      const prematurelyPottedEight = didPotEight && !oneThruSevenPotted;
+      const scratchedOnEight = oneThruSevenPotted && action === Action.Scratch;
+      // win conditions
+      const wonProperly = didPotEight && oneThruSevenPotted;
+      if (wonProperly || scratchedOnEight || prematurelyPottedEight) {
+        setIsGameOver(true);
+      }
+    } else if (gameType === GameType.NineBall) {
+      // 9ball win-condititions
+      const didPotNine = balls[8];
+
+      if (didPotNine) {
+        setIsGameOver(true);
+      }
+    }
+
+    const gameState = {
+      inning,
+      playerId: currPlayer.id,
+      balls,
+      action,
+      isGameOver,
+      matchId,
+    };
+
+    try {
+      const res = await axios.post(endpointUrl, gameState);
+      console.log(res);
+    } catch (err) {
+      const error = err as Error;
+      setErr(`Failed to send game state to server: ${error.message}`);
+    }
+  };
+
+  // determine whose turn it is depending on the current number of innings
+  React.useEffect(() => {
+    if (inning % 2 === 0) {
+      setCurrPlayer(playerA);
+      return;
+    }
+    setCurrPlayer(playerB);
+  }, [inning]);
+
+  // initialize the game balls depending on what type of game is being played
   React.useEffect(() => {
     const nineBalls = [
       false,
@@ -56,7 +135,8 @@ const GamePage = ({ playerA, playerB, gameType }: Props) => {
   return (
     <div className="game-page">
       <h1>Game page</h1>
-      <h2>{`${inning % 2 === 0 ? playerA.name : playerB.name}'s Turn'`}</h2>
+      {err && <p>{err}</p>}
+      <h2>{`${currPlayer.name}'s Turn'`}</h2>
       <BallsContainer className="poolballs">
         {balls.map((b, idx) => (
           <PoolBall
@@ -72,23 +152,31 @@ const GamePage = ({ playerA, playerB, gameType }: Props) => {
       </BallsContainer>
 
       <div className="actions">
-        <button className="next-turn" onClick={() => setInning(inning + 1)}>
+        <button
+          className="next-turn"
+          onClick={() => {
+            setInning(inning + 1);
+            pushGameState(Action.Turnover);
+          }}
+        >
           Next turn
         </button>
         <button
-          className="scratch"
+          className="scratch-btn"
           onClick={() => {
             setInning(inning + 1);
             setNumScratches(numScratches + 1);
+            pushGameState(Action.Scratch, false);
           }}
         >
           Scratch
         </button>
         <button
-          className="next-turn"
+          className="safety-btn"
           onClick={() => {
             setInning(inning + 1);
             setNumSafeties(numSafeties + 1);
+            pushGameState(Action.Safety, false);
           }}
         >
           Safety

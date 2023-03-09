@@ -6,6 +6,7 @@ import Home from "./pages/home";
 import GameSettings from "./pages/game-settings";
 import Game, { GameType } from "./pages/game";
 import { RealmAppProvider } from "./hooks/useRealmApp";
+import { MatchContextProvider } from "./hooks/useMatch";
 import appConfig from "../realm.json";
 import "./App.css";
 
@@ -28,16 +29,25 @@ function App() {
     {
       path: "/matches/:matchid/games/:gameid/scorekeeper",
       element: (
-        <Game
-          gameType={GameType.EightBall}
-          playerA={{ name: "eren" }}
-          playerB={{ name: "armin" }}
-        />
+        <MatchContextProvider>
+          <Game
+            matchId="foobar"
+            gameSettings={{
+              gameType: GameType.EightBall,
+              playerA: { id: "1", name: "eren" },
+              playerB: { id: "2", name: "armin" },
+            }}
+          />
+        </MatchContextProvider>
       ),
     },
     {
       path: "/matches/:matchid/games/:gameid/players",
-      element: <GameSettings />,
+      element: (
+        <MatchContextProvider>
+          <GameSettings />
+        </MatchContextProvider>
+      ),
     },
   ]);
 
