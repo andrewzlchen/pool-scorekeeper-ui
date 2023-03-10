@@ -1,9 +1,10 @@
 import React from "react";
 import * as Realm from "realm-web";
 import styled from "@emotion/styled";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { useRealmApp } from "../../hooks/useRealmApp";
+import urls from "../../common/urls";
 
 interface OwnProps {
   isLogin?: boolean; // determines whether to show the login page or the sign up page
@@ -26,13 +27,17 @@ const Background = styled.div`
 `;
 
 const Form = styled.form`
-  width: 70%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   color: black;
 `;
 
 const AuthPage = ({ isLogin }: OwnProps) => {
+  const [error, setError] = React.useState("");
+
+  const navigate = useNavigate();
+
   const realmApp = useRealmApp();
   if (realmApp.currentUser) {
     return (
@@ -46,6 +51,7 @@ const AuthPage = ({ isLogin }: OwnProps) => {
   const [password, setPassword] = React.useState("");
 
   const handleSubmit = async (event: any) => {
+    setError("");
     event.preventDefault();
 
     try {
@@ -54,29 +60,33 @@ const AuthPage = ({ isLogin }: OwnProps) => {
       }
 
       await realmApp.logIn(Realm.Credentials.emailPassword(email, password));
+      navigate(urls.matches().list());
     } catch (err) {
-      // Nice!
-      alert(err);
+      const error = err as Error;
+      setError(`Failed to authenticate: ${error.message}`);
     }
   };
 
   return (
     <Background>
-      <div className="flex flex-col items-center w-4/5 max-w-sm">
+      <div className="flex flex-col items-center w-4/5 max-w-md">
         <h1 className="font-header text-5xl mb-5">Hey Shark!</h1>
         <h2 className="mb-8">
           Log in or create an account to see your performance and progress
         </h2>
+        {error && (
+          <div className="alert alert-error shadow-lg mb-5 w-full">{error}</div>
+        )}
         <Form onSubmit={handleSubmit}>
           <input
-            className="input input-bordered w-full max-w-xs mb-5"
+            className="input input-bordered mb-5"
             type="text"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
           <input
-            className="input input-bordered w-full max-w-xs mb-5"
+            className="input input-bordered mb-5"
             type="password"
             placeholder="Password"
             value={password}
