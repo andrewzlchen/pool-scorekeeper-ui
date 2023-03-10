@@ -4,6 +4,12 @@ import { useNavigate } from "react-router-dom";
 import urls from "../../common/urls";
 import { useRealmApp } from "../../hooks/useRealmApp";
 
+import * as Realm from "realm-web";
+const {
+  BSON: { ObjectId },
+} = Realm;
+import moment from "moment";
+
 import Divider from "../../common/divider";
 
 const Container = styled.div`
@@ -34,14 +40,94 @@ const Badge = styled.div`
   align-items: center;
 `;
 
-const upcomingMatches = true;
-const previousMatches = true;
 const Matches = () => {
   const { currentUser } = useRealmApp();
 
   const navigate = useNavigate();
 
-  // TODO wire up actual match data
+  // TODO: use useTeam()
+  const mongo = currentUser.mongoClient('mongodb-atlas');
+  const teams = mongo.db('app').collection('teams');
+  const teamMatches = mongo.db('app').collection('team_matches');
+
+  const [previousMatchups, setPreviousMatchups] = React.useState<any[]>([]);
+  const [upcomingMatchups, setUpcomingMatchups] = React.useState<any[]>([]);
+
+  const fetchTeamDataForCurrentUser = async () => {
+    return await teams.findOne({ "players": new ObjectId(currentUser.id) });
+  }
+
+  const fetchTeamMatchupsForTeam = async (teamName: string) => {
+    return await teamMatches.find({ "$or": [{"team1": teamName}, {"team2": teamName}] });
+  }
+
+  React.useEffect(() => {
+    fetchTeamDataForCurrentUser()
+      .then((team) => {
+        if (team) {
+          fetchTeamMatchupsForTeam(team.name)
+            .then((matchupsRes) => {
+              const upcomingMatchupsToSet: any[] = [];
+              const previousMatchupsToSet: any[] = [];
+
+              const startOfToday = new Date();
+              startOfToday.setHours(0,0,0,0);
+
+              matchupsRes.forEach((matchup: any) => {
+                const matchDate = new Date(matchup.ts * 1000);
+
+                if (startOfToday < matchDate) {
+                  upcomingMatchupsToSet.push(matchup);
+                } else {
+                  previousMatchupsToSet.push(matchup);
+                }
+              });
+
+              setUpcomingMatchups(upcomingMatchupsToSet);
+              setPreviousMatchups(previousMatchupsToSet);
+            });
+        }
+      })
+      .catch((e) => {
+        console.log(e.message);
+      })
+  }, [])
+
+  const getUpcomingMatches = () => {
+    return upcomingMatchups.map((match) => {
+      const timestamp = moment(match.ts * 1000).format('LLLL');
+
+      return(
+        <Card>
+          <span>{timestamp}</span>
+          <button
+            className="btn btn-primary"
+            onClick={() =>
+              navigate(urls.app().matches().games("testMatch").list())
+            }
+          >
+            Set Up
+          </button>
+        </Card>
+      );
+    });
+  }
+
+  const getPreviousMatches = () => {
+    return previousMatchups.map((match) => {
+      const timestamp = moment(match.ts * 1000).format('LLLL');
+
+      // TODO use actual match data
+      return(
+        <Card>
+          <span>{timestamp}</span>
+          <Badge>WON 5-3</Badge>
+        </Card>
+      );
+    });
+  }
+
+  // TODO add in ability to set name and keep track of W/L
   return (
     <Container className="w-4/5 max-w-md">
       <h1>Andrew C.</h1>
@@ -56,30 +142,17 @@ const Matches = () => {
         Log out
       </button>
       <Divider />
-      {upcomingMatches && (
+      {upcomingMatchups && (
         <div className="my-16">
-          <h2 className="mb-5">Upcoming Match</h2>
-          <Card>
-            <span>March 7</span>
-            <button
-              className="btn btn-primary"
-              onClick={() =>
-                navigate(urls.app().matches().games("testMatch").list())
-              }
-            >
-              Set Up
-            </button>
-          </Card>
+          <h2 className="mb-5">Upcoming Matches</h2>
+          {getUpcomingMatches()}
         </div>
       )}
 
-      {previousMatches && (
+      {previousMatchups && (
         <>
           <h2 className="mb-5">Previous Matches</h2>
-          <Card>
-            <span>February 21</span>
-            <Badge>WON 5-3</Badge>
-          </Card>
+          {getPreviousMatches()}
         </>
       )}
     </Container>
