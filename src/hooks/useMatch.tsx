@@ -14,11 +14,11 @@ export const MatchContextProvider = ({ children }: PropsWithChildren) => {
     settings: {
       gameType: GameType.EightBall,
       playerA: {
-        id: "testPlayerA",
+        _id: "testPlayerA",
         name: "test player a",
       },
       playerB: {
-        id: "testPlayerB",
+        _id: "testPlayerB",
         name: "test player b",
       },
     },

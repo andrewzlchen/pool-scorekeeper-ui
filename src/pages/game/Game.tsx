@@ -70,7 +70,7 @@ const GamePage = ({
 
     const gameState = {
       inning,
-      playerId: currPlayer.id,
+      playerId: currPlayer._id,
       balls,
       action: lastAction,
       isGameOver,

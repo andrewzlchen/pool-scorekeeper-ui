@@ -4,7 +4,7 @@ import { RealmAppProvider } from "./hooks/useRealmApp";
 import { MatchContextProvider } from "./hooks/useMatch";
 import App from "./pages/app";
 import Auth from "./pages/auth";
-import NoPageFound from "./pages/no-page-found";
+import ErrorPage from "./pages/error";
 import Match from "./pages/match";
 import Matches from "./pages/matches";
 import Game from "./pages/game";
@@ -31,6 +31,7 @@ function Router() {
           <App />
         </MatchContextProvider>
       ),
+      errorElement: <ErrorPage error="Something bad occurred" />,
       children: [
         {
           path: "/app/matches",
@@ -47,8 +48,8 @@ function Router() {
               matchId="foobar"
               gameSettings={{
                 gameType: GameType.EightBall,
-                playerA: { id: "1", name: "eren" },
-                playerB: { id: "2", name: "armin" },
+                playerA: { _id: "1", name: "eren" },
+                playerB: { _id: "2", name: "armin" },
               }}
             />
           ),
@@ -57,7 +58,7 @@ function Router() {
     },
     {
       path: "*",
-      element: <NoPageFound />,
+      element: <ErrorPage error="404 - No Page Found!" />,
     },
   ]);
 

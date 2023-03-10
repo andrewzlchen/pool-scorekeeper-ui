@@ -1,19 +1,27 @@
-import axios from "axios";
 import React from "react";
 import { Team } from "../common/types";
+import { useRealmApp } from "./useRealmApp";
+import { BSON } from "realm-web";
+import useGraphQL from "./useGraphQL";
 
-export const useTeam = (id: string) => {
+export const useTeamByCurrentUser = () => {
   const [error, setError] = React.useState("");
-  const [team, setTeam] = React.useState();
+  const [team, setTeam] = React.useState<Team>();
   const [loading, setLoading] = React.useState(false);
+
+  const realmApp = useRealmApp();
+  const mongo = realmApp.currentUser.mongoClient("mongodb-atlas");
+  const teamsCollection = mongo.db("app").collection("teams");
 
   React.useEffect(() => {
     const getTeam = async () => {
+      setError("");
       try {
-        const endpointUrl = `${id}`;
         setLoading(true);
-        const res = await axios.get(endpointUrl);
-        setTeam(res.data);
+        const res = await teamsCollection.findOne({
+          players: new BSON.ObjectId(realmApp.currentUser.id),
+        });
+        setTeam(res);
       } catch (err) {
         const error = err as Error;
         setError(error.message);
@@ -23,22 +31,27 @@ export const useTeam = (id: string) => {
     };
 
     getTeam();
-  });
+  }, []);
 
   return { team, loading, error };
 };
 
+// TODO [nice-to-have] Make this hook accept a season to prevent it from returning teams from previous seasons
 export const useTeams = () => {
   const [error, setError] = React.useState("");
   const [teams, setTeams] = React.useState<Team[]>();
   const [loading, setLoading] = React.useState(false);
 
+  const realmApp = useRealmApp();
+  const mongo = realmApp.currentUser.mongoClient("mongodb-atlas");
+  const teamsCollection = mongo.db("app").collection("teams");
+
   React.useEffect(() => {
     const getTeam = async () => {
+      setError("");
       try {
-        const endpointUrl = "";
         setLoading(true);
-        const res = await axios.get(endpointUrl);
+        const res = await teamsCollection.find({});
         setTeams(res.data);
       } catch (err) {
         const error = err as Error;
@@ -49,7 +62,7 @@ export const useTeams = () => {
     };
 
     getTeam();
-  });
+  }, []);
 
   return { teams, loading, error };
 };

@@ -1,10 +1,11 @@
 import React from "react";
 import styled from "@emotion/styled";
+import moment from "moment";
 
-import GameSettings from "./game-settings/GameSettings";
 import Divider from "../../common/divider/Divider";
-import divider from "../../common/divider";
-import { Player } from "../../common/types";
+import { Team } from "../../common/types";
+import useTeamMatch from "../../hooks/useTeamMatch";
+import useGraphQL from "../../hooks/useGraphQL";
 
 const Container = styled.div`
   width: 80%;
@@ -33,120 +34,132 @@ const EmptyPlayerIcon = styled.div`
   border: #d9d9d9 solid 1px;
   text-align: center;
 `;
-// TODO wire up real data
+
 const Match = () => {
-  const [selectedMatch, setSelectedMatch] = React.useState<
-    number | undefined
-  >();
+  const [matchups, setMatchups] = React.useState();
+  const { match, loading: matchLoading, error: matchError } = useTeamMatch();
 
-  const [leftPlayerOpts, setLeftPlayerOpts] = React.useState<Player[]>([]);
-  const [rightPlayerOpts, setRightPlayerOpts] = React.useState<Player[]>([]);
-
-  const [leftPlayerId, setLeftPlayerId] = React.useState("");
-  const [rightPlayerId, setRightPlayerId] = React.useState("");
-
-  React.useEffect(() => {
-    // TODO Load the 2 player teams
-    setLeftPlayerOpts([]);
-    setRightPlayerOpts([]);
-  }, []);
+  const [selectedMatch, setSelectedMatch] = React.useState<number>();
+  const [leftPlayerId, setLeftPlayerId] = React.useState<string>();
+  const [rightPlayerId, setRightPlayerId] = React.useState<string>();
 
   const onSubmitMatchup = () => {
     // TODO push data to app to create the new matchup and then navigate to game page
   };
 
+  if (matchLoading) {
+    return <h2>Loading...</h2>;
+  }
+
+  const hasError = matchError;
+  if (hasError) {
+    return (
+      <>
+        {matchError && (
+          <div className="alert alert-error shadow-lg mb-5 w-full">
+            Failed to get match: {matchError}
+          </div>
+        )}
+      </>
+    );
+  }
+  // if we get here, match, leftTeam and rightTeam should all exist
   return (
     <Container className="w-4/5 max-w-md">
-      <h1>March 7</h1>
-      <h3>MonGods vs. Team 2</h3>
+      <>
+        <h1>{moment(match?.ts || 0 * 1000).format("LLLL")}</h1>
+        <h3 className="">
+          {match?.team1?.name} vs. {match?.team2?.name}
+        </h3>
 
-      <Divider />
+        <Divider />
 
-      <h3>Match 1</h3>
-      <Card
-        onClick={() => {
-          setSelectedMatch(1);
-        }}
-      >
-        <label htmlFor="game-settings-modal">{"+ Select Players"}</label>
-      </Card>
-      <h3>Match 2</h3>
-      <Card
-        onClick={() => {
-          setSelectedMatch(2);
-        }}
-      >
-        <label htmlFor="game-settings-modal">{"+ Select Players"}</label>
-      </Card>
-      <h3>Match 3</h3>
-      <Card
-        onClick={() => {
-          setSelectedMatch(3);
-        }}
-      >
-        <label htmlFor="game-settings-modal">{"+ Select Players"}</label>
-      </Card>
-      <h3>Match 4</h3>
-      <Card
-        onClick={() => {
-          setSelectedMatch(4);
-        }}
-      >
-        <label htmlFor="game-settings-modal">{"+ Select Players"}</label>
-      </Card>
+        <h3>Match 1</h3>
+        <Card
+          onClick={() => {
+            setSelectedMatch(1);
+          }}
+        >
+          <label htmlFor="game-settings-modal">{"+ Select Players"}</label>
+        </Card>
+        <h3>Match 2</h3>
+        <Card
+          onClick={() => {
+            setSelectedMatch(2);
+          }}
+        >
+          <label htmlFor="game-settings-modal">{"+ Select Players"}</label>
+        </Card>
+        <h3>Match 3</h3>
+        <Card
+          onClick={() => {
+            setSelectedMatch(3);
+          }}
+        >
+          <label htmlFor="game-settings-modal">{"+ Select Players"}</label>
+        </Card>
+        <h3>Match 4</h3>
+        <Card
+          onClick={() => {
+            setSelectedMatch(4);
+          }}
+        >
+          <label htmlFor="game-settings-modal">{"+ Select Players"}</label>
+        </Card>
 
-      <div>
-        <input
-          type="checkbox"
-          id="game-settings-modal"
-          className="modal-toggle"
-        />
-        <label htmlFor="game-settings-modal" className="modal cursor-pointer">
-          <label className="modal-box relative" htmlFor="game-settings-modal">
-            <h3 className="text-lg font-bold">
-              Match {selectedMatch} - Choose Players
-            </h3>
-            <div className="flex items-center justify-around my-5">
-              <div className="flex flex-col items-center">
-                <select
-                  className="select select-bordered w-full max-w-xs"
-                  value={leftPlayerId}
-                  onClick={(e) => {
-                    setLeftPlayerId(e.target.value);
-                  }}
-                >
-                  {leftPlayerOpts.map((player) => (
-                    <option value={player.id}>{player.name}</option>
-                  ))}
-                </select>
+        <div>
+          <input
+            type="checkbox"
+            id="game-settings-modal"
+            className="modal-toggle"
+          />
+          <label htmlFor="game-settings-modal" className="modal cursor-pointer">
+            <label className="modal-box relative" htmlFor="game-settings-modal">
+              <h3 className="text-lg font-bold">
+                Match {selectedMatch} - Choose Players
+              </h3>
+              <div className="flex items-center justify-around my-5">
+                <div className="flex flex-col items-center">
+                  <select
+                    className="select select-bordered w-full max-w-xs"
+                    value={leftPlayerId}
+                    onClick={(e) => {
+                      setLeftPlayerId(e.target.value);
+                    }}
+                  >
+                    {match?.team1?.players.map((player) => (
+                      <option value={player._id}>{player.name}</option>
+                    ))}
+                  </select>
 
-                <span>MonGods</span>
+                  <span>{match?.team1?.name}</span>
+                </div>
+                <span>{" VS. "}</span>
+                <div className="flex flex-col items-center">
+                  <select
+                    className="select select-bordered w-full max-w-xs"
+                    value={rightPlayerId}
+                    onChange={(e) => {
+                      setRightPlayerId(e.target.value);
+                    }}
+                  >
+                    {match?.team2?.players.map((player) => (
+                      <option value={player._id}>{player.name}</option>
+                    ))}
+                  </select>
+                  <span>{match?.team2?.name}</span>
+                </div>
               </div>
-              <span>{" VS. "}</span>
-              <div className="flex flex-col items-center">
-                <select
-                  className="select select-bordered w-full max-w-xs"
-                  value={rightPlayerId}
-                  onChange={(e) => {
-                    setRightPlayerId(e.target.value);
-                  }}
-                >
-                  {rightPlayerOpts.map((player) => (
-                    <option value={player.id}>{player.name}</option>
-                  ))}
-                </select>
-                <span>Team 2</span>
-              </div>
-            </div>
 
-            <div className="flex justify-center">
-              <button className="btn btn-primary" onClick={onSubmitMatchup}>
-                Submit
-              </button>
-            </div>
+              <div className="flex justify-center">
+                <button className="btn btn-primary" onClick={onSubmitMatchup}>
+                  Submit
+                </button>
+              </div>
+            </label>
           </label>
-        </label>
-      </div>
+        </div>
+      </>
     </Container>
   );
 };

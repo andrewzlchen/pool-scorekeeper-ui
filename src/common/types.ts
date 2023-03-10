@@ -1,10 +1,14 @@
+// DB Types
 export interface TeamMatch {
-  id: string;
-  singlesMatches: SinglesMatch[];
+  _id: string;
+  singles_Matches: SinglesMatch[];
+  ts: number;
+  team1: Team;
+  team2: Team;
 }
 
 export interface SinglesMatch {
-  id: string;
+  _id: string;
   settings: GameSettings;
   games: Game[];
 }
@@ -12,7 +16,6 @@ export interface SinglesMatch {
 export interface Game {
   states: GameState[];
 }
-
 export interface GameState {
   balls: boolean[];
   player: Player;
@@ -25,10 +28,20 @@ export interface Team {
 }
 
 export interface Player {
-  id: string;
+  _id: string;
   name: string;
 }
 
+export interface PlayerStats {
+  overall: OverallPlayerStats;
+  season: string;
+}
+interface OverallPlayerStats {
+  wins: number;
+  losses: number;
+}
+
+// Misc types
 export enum GameType {
   EightBall = "8ball",
   NineBall = "9ball",

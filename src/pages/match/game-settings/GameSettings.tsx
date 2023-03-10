@@ -35,7 +35,7 @@ const GameSettingsPage = ({ teamA, teamB }: Props) => {
     id: string,
     setter: (player?: Player) => void
   ) => {
-    setter(players.find((p) => p.id === id));
+    setter(players.find((p) => p._id === id));
   };
 
   const onStartMatch = () => {
@@ -66,25 +66,25 @@ const GameSettingsPage = ({ teamA, teamB }: Props) => {
         <option value={GameType.NineBall}>9-ball</option>
       </select>
       <select
-        value={playerA?.id}
+        value={playerA?._id}
         onChange={(e) =>
           onChangePlayer(teamA.players, e.target.value, setPlayerA)
         }
       >
         {teamA.players.map((player) => (
-          <option key={player.name} value={player.id}>
+          <option key={player.name} value={player._id}>
             {player.name}
           </option>
         ))}
       </select>
       <select
-        value={playerB?.id}
+        value={playerB?._id}
         onChange={(e) =>
           onChangePlayer(teamB.players, e.target.value, setPlayerB)
         }
       >
         {teamB.players.map((player) => (
-          <option key={player.name} value={player.id}>
+          <option key={player.name} value={player._id}>
             {player.name}
           </option>
         ))}

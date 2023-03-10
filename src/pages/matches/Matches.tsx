@@ -11,6 +11,9 @@ const {
 import moment from "moment";
 
 import Divider from "../../common/divider";
+import { useTeamByCurrentUser } from "../../hooks/useTeam";
+import usePlayer from "../../hooks/usePlayer";
+import usePlayerStats from "../../hooks/usePlayerStats";
 
 const Container = styled.div`
   justify-self: center;
@@ -47,149 +50,79 @@ const Matches = () => {
 
   const [previousMatchups, setPreviousMatchups] = React.useState<any[]>([]);
   const [upcomingMatchups, setUpcomingMatchups] = React.useState<any[]>([]);
-  const [isOnTeam, setIsOnTeam] = React.useState(false);
-  const [isLoadingTeamInfo, setIsLoadingTeamInfo] = React.useState(true);
+  const { player, loading: playerLoading, error: playerError } = usePlayer();
+  const {
+    team,
+    loading: teamLoading,
+    error: teamError,
+  } = useTeamByCurrentUser();
 
-  const [player, setPlayer] = React.useState<any>(null);
-  const [isLoadingPlayer, setIsLoadingPlayer] = React.useState(true);
-
-  const [playerStats, setPlayerStats] = React.useState<any>(null);
-  const [isLoadingPlayerStats, setIsLoadingPlayerStats] = React.useState(true);
+  const {
+    playerStats,
+    loading: playerStatsLoading,
+    error: playerStatsError,
+  } = usePlayerStats();
 
   // TODO: use useTeam()
-  const mongo = currentUser.mongoClient('mongodb-atlas');
+  const mongo = currentUser.mongoClient("mongodb-atlas");
 
-  const teamsCol = mongo.db('app').collection('teams');
-  const teamMatchesCol = mongo.db('app').collection('team_matches');
-  const playerStatsCol = mongo.db('app').collection('player_stats');
-  const playersCol = mongo.db('app').collection('players');
+  const teamsCol = mongo.db("app").collection("teams");
+  const teamMatchesCol = mongo.db("app").collection("team_matches");
 
   const fetchTeamDataForCurrentUser = async () => {
-    return await teamsCol.findOne({ "players": new ObjectId(currentUser.id) });
+    return await teamsCol.findOne({ players: new ObjectId(currentUser.id) });
   };
 
   const fetchTeamMatchupsForTeam = async (teamName: string) => {
-    return await teamMatchesCol.find({ "$or": [{"team1": teamName}, {"team2": teamName}] });
-  };
-
-  const fetchPlayerForCurrentUser = async () => {
-    return await playersCol.findOne({ "_id": new ObjectId(currentUser.id) });
-  };
-
-  const fetchPlayerStatsForCurrentUser = async () => {
-    return await playerStatsCol.findOne({ "player": new ObjectId(currentUser.id) });
+    return await teamMatchesCol.find({
+      $or: [{ team1: teamName }, { team2: teamName }],
+    });
   };
 
   React.useEffect(() => {
-    if (!currentUser) {
-      return;
-    }
-
-    fetchPlayerForCurrentUser()
-      .then((playerRes) => {
-        setPlayer(playerRes);
-      })
-      .catch((e) => {
-        console.log(e.message);
-      })
-      .finally(() => {
-        setIsLoadingPlayer(false);
-      });
-
-    fetchPlayerStatsForCurrentUser()
-      .then((playerStatsRes) => {
-        setPlayerStats(playerStatsRes);
-      })
-      .catch((e) => {
-        console.log(e.message);
-      })
-      .finally(() => {
-        setIsLoadingPlayerStats(false);
-      });
-
     fetchTeamDataForCurrentUser()
       .then((team) => {
         if (team) {
-          fetchTeamMatchupsForTeam(team.name)
-            .then((matchupsRes) => {
-              const upcomingMatchupsToSet: any[] = [];
-              const previousMatchupsToSet: any[] = [];
+          fetchTeamMatchupsForTeam(team.name).then((matchupsRes) => {
+            const upcomingMatchupsToSet: any[] = [];
+            const previousMatchupsToSet: any[] = [];
 
-              const startOfToday = new Date();
-              startOfToday.setHours(0,0,0,0);
+            const startOfToday = new Date();
+            startOfToday.setHours(0, 0, 0, 0);
 
-              matchupsRes.forEach((matchup: any) => {
-                const matchDate = new Date(matchup.ts * 1000);
+            matchupsRes.forEach((matchup: any) => {
+              const matchDate = new Date(matchup.ts * 1000);
 
-                if (startOfToday < matchDate) {
-                  upcomingMatchupsToSet.push(matchup);
-                } else {
-                  previousMatchupsToSet.push(matchup);
-                }
-              });
-
-              setUpcomingMatchups(upcomingMatchupsToSet);
-              setPreviousMatchups(previousMatchupsToSet);
+              if (startOfToday < matchDate) {
+                upcomingMatchupsToSet.push(matchup);
+              } else {
+                previousMatchupsToSet.push(matchup);
+              }
             });
 
-          setIsOnTeam(true);
+            setUpcomingMatchups(upcomingMatchupsToSet);
+            setPreviousMatchups(previousMatchupsToSet);
+          });
         }
       })
       .catch((e) => {
         console.log(e.message);
-      })
-      .finally(() => {
-        setIsLoadingTeamInfo(false);
       });
   }, []);
 
-  const getUpcomingMatches = () => {
-    return upcomingMatchups.map((match) => {
-      const timestamp = moment(match.ts * 1000).format('LLLL');
-
-      return(
-        <Card>
-          <span>{timestamp}</span>
-          <button
-            className="btn btn-primary"
-            onClick={() =>
-              navigate(urls.app().matches().games("testMatch").list())
-            }
-          >
-            Set Up
-          </button>
-        </Card>
-      );
-    });
-  }
-
-  const getPreviousMatches = () => {
-    return previousMatchups.map((match) => {
-      const timestamp = moment(match.ts * 1000).format('LLLL');
-
-      // TODO use actual match data
-      return(
-        <Card>
-          <span>{timestamp}</span>
-          <Badge>WON 5-3</Badge>
-        </Card>
-      );
-    });
-  }
-
-  const isLoading = isLoadingPlayer || isLoadingPlayerStats || isLoadingTeamInfo;
-  if (isLoading) {
-    return undefined;
-  }
-
-  if (!isOnTeam) {
-    return <div>{player ? player.name : 'Unnamed Pool Shark'} is not on a team</div>
-  }
-
-  return (
+  const isLoading = playerLoading || teamLoading || playerStatsLoading;
+  return isLoading ? (
+    <>Loading...</>
+  ) : (
     <Container className="w-4/5 max-w-md">
-      <h1>{player ? player.name : 'Unnamed Pool Shark'}</h1>
-      {playerStats && (<h3>{playerStats.overall.wins} Wins • {playerStats.overall.losses} Loss</h3>)}
+      <h1>{player ? player.name : "Unnamed Pool Shark"}</h1>
+      {playerStats && (
+        <h3>
+          {playerStats.overall.wins} Win(s) • {playerStats.overall.losses}{" "}
+          Loss(es)
+        </h3>
+      )}
+      {team && <p>{team.name}</p>}
       <button
         className="btn btn-accent"
         onClick={async () => {
@@ -200,17 +133,70 @@ const Matches = () => {
         Log out
       </button>
       <Divider />
+
+      {playerError && (
+        <div className="alert alert-error shadow-lg mb-5 w-full">
+          Failed to get player: {playerError}
+        </div>
+      )}
+      {teamError && (
+        <div className="alert alert-error shadow-lg mb-5 w-full">
+          Failed to get player team: {teamError}
+        </div>
+      )}
+      {playerStatsError && (
+        <div className="alert alert-error shadow-lg mb-5 w-full">
+          Failed to get player stats: {playerStatsError}
+        </div>
+      )}
       {upcomingMatchups && (
         <div className="my-16">
           <h2 className="mb-5">Upcoming Matches</h2>
-          {getUpcomingMatches()}
+          {upcomingMatchups.map((match) => {
+            const timestamp = moment(match.ts * 1000).format("LLLL");
+
+            let opponent: string;
+            if (match.team1 === team?.name) {
+              opponent = match.team2;
+            } else {
+              opponent = match.team1;
+            }
+            return (
+              <Card>
+                <span className="flex flex-col items-start">
+                  <p>{opponent}</p>
+                  <p className="prose prose-slate">@ {timestamp}</p>
+                </span>
+                <button
+                  className="btn btn-primary"
+                  onClick={() =>
+                    navigate(
+                      urls.app().matches().games(match._id.toString()).list()
+                    )
+                  }
+                >
+                  Set Up
+                </button>
+              </Card>
+            );
+          })}
         </div>
       )}
 
       {previousMatchups && (
         <>
           <h2 className="mb-5">Previous Matches</h2>
-          {getPreviousMatches()}
+          {previousMatchups.map((match) => {
+            const timestamp = moment(match.ts * 1000).format("LLLL");
+
+            // TODO use actual match data
+            return (
+              <Card>
+                <span>{timestamp}</span>
+                <Badge>WON 5-3</Badge>
+              </Card>
+            );
+          })}
         </>
       )}
     </Container>
