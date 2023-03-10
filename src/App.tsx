@@ -1,6 +1,5 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-import Layout from "./common/layout";
 import Auth from "./pages/auth";
 import Game from "./pages/game";
 import { RealmAppProvider } from "./hooks/useRealmApp";
