@@ -47,6 +47,7 @@ const Matches = () => {
 
   const [previousMatchups, setPreviousMatchups] = React.useState<any[]>([]);
   const [upcomingMatchups, setUpcomingMatchups] = React.useState<any[]>([]);
+  const [isOnTeam, setIsOnTeam] = React.useState(false);
   const [isLoadingTeamInfo, setIsLoadingTeamInfo] = React.useState(true);
 
   const [player, setPlayer] = React.useState<any>(null);
@@ -80,6 +81,10 @@ const Matches = () => {
   };
 
   React.useEffect(() => {
+    if (!currentUser) {
+      return;
+    }
+
     fetchPlayerForCurrentUser()
       .then((playerRes) => {
         setPlayer(playerRes);
@@ -126,6 +131,8 @@ const Matches = () => {
               setUpcomingMatchups(upcomingMatchupsToSet);
               setPreviousMatchups(previousMatchupsToSet);
             });
+
+          setIsOnTeam(true);
         }
       })
       .catch((e) => {
@@ -171,8 +178,15 @@ const Matches = () => {
   }
 
   const isLoading = isLoadingPlayer || isLoadingPlayerStats || isLoadingTeamInfo;
+  if (isLoading) {
+    return undefined;
+  }
 
-  return isLoading ? undefined : (
+  if (!isOnTeam) {
+    return <div>{player ? player.name : 'Unnamed Pool Shark'} is not on a team</div>
+  }
+
+  return (
     <Container className="w-4/5 max-w-md">
       <h1>{player ? player.name : 'Unnamed Pool Shark'}</h1>
       {playerStats && (<h3>{playerStats.overall.wins} Wins • {playerStats.overall.losses} Loss</h3>)}
