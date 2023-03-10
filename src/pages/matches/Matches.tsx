@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import urls from "../../common/urls";
 import { useRealmApp } from "../../hooks/useRealmApp";
 
+import Divider from "../../common/divider";
+
 const Container = styled.div`
   justify-self: center;
   text-align: center;
@@ -53,15 +55,17 @@ const Matches = () => {
       >
         Log out
       </button>
-      <hr className="mb-16" />
+      <Divider />
       {upcomingMatches && (
-        <div className="mb-16">
+        <div className="my-16">
           <h2 className="mb-5">Upcoming Match</h2>
           <Card>
             <span>March 7</span>
             <button
               className="btn btn-primary"
-              onClick={() => navigate(urls.app().matches().get("foobar"))}
+              onClick={() =>
+                navigate(urls.app().matches().games("testMatch").list())
+              }
             >
               Set Up
             </button>

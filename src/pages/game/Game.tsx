@@ -30,13 +30,10 @@ const GamePage = ({
   const [numSafeties, setNumSafeties] = React.useState(0);
   const [balls, setBalls] = React.useState<boolean[]>([]);
   const [err, setErr] = React.useState("");
+  const [lastAction, setLastAction] = React.useState<Action>(Action.Turnover);
   const [isGameOver, setIsGameOver] = React.useState(false);
 
-  // push the state of the game as of the end of the previous turn. should be called upon ending the turn
-  const pushGameState = async (action: Action) => {
-    const endpointUrl =
-      "https://data.mongodb-api.com/app/table-runner-qzkyp/endpoint/game_state/push";
-
+  React.useEffect(() => {
     // game over conditions:
     // 1. 8-ball, scratch on 8
     // 2. 8-ball, prematurely potting the 8
@@ -49,7 +46,8 @@ const GamePage = ({
 
       // loss conditions
       const prematurelyPottedEight = didPotEight && !oneThruSevenPotted;
-      const scratchedOnEight = oneThruSevenPotted && action === Action.Scratch;
+      const scratchedOnEight =
+        oneThruSevenPotted && lastAction === Action.Scratch;
       // win conditions
       const wonProperly = didPotEight && oneThruSevenPotted;
       if (wonProperly || scratchedOnEight || prematurelyPottedEight) {
@@ -63,12 +61,18 @@ const GamePage = ({
         setIsGameOver(true);
       }
     }
+  }, [lastAction]);
+
+  // push the state of the game as of the end of the previous turn. should be called upon ending the turn
+  const pushGameState = async () => {
+    const endpointUrl =
+      "https://data.mongodb-api.com/app/table-runner-qzkyp/endpoint/game_state/push";
 
     const gameState = {
       inning,
       playerId: currPlayer.id,
       balls,
-      action,
+      action: lastAction,
       isGameOver,
       matchId,
     };
@@ -135,7 +139,8 @@ const GamePage = ({
           className="next-turn"
           onClick={() => {
             setInning(inning + 1);
-            pushGameState(Action.Turnover);
+            setLastAction(Action.Turnover);
+            pushGameState();
           }}
         >
           Next turn
@@ -145,7 +150,8 @@ const GamePage = ({
           onClick={() => {
             setInning(inning + 1);
             setNumScratches(numScratches + 1);
-            pushGameState(Action.Scratch);
+            setLastAction(Action.Scratch);
+            pushGameState();
           }}
         >
           Scratch
@@ -155,7 +161,8 @@ const GamePage = ({
           onClick={() => {
             setInning(inning + 1);
             setNumSafeties(numSafeties + 1);
-            pushGameState(Action.Safety);
+            setLastAction(Action.Safety);
+            pushGameState();
           }}
         >
           Safety

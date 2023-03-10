@@ -3,6 +3,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import styled from "@emotion/styled";
 import { useRealmApp } from "../../hooks/useRealmApp";
 import urls from "../../common/urls";
+import BackArrow from "../../common/back-arrow";
 
 const Background = styled.div`
   background-color: #f9f9f9;

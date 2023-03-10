@@ -4,9 +4,9 @@ import { RealmAppProvider } from "./hooks/useRealmApp";
 import { MatchContextProvider } from "./hooks/useMatch";
 import App from "./pages/app";
 import Auth from "./pages/auth";
-import NoPageFound from "./pages/no-page-found/NoPageFound";
-import MatchGames from "./pages/match-games/MatchGames";
-import Matches from "./pages/matches/Matches";
+import NoPageFound from "./pages/no-page-found";
+import Match from "./pages/match";
+import Matches from "./pages/matches";
 import Game from "./pages/game";
 
 import { GameType } from "./common/types";
@@ -38,7 +38,7 @@ function Router() {
         },
         {
           path: "/app/matches/:matchid/games",
-          element: <MatchGames />,
+          element: <Match />,
         },
         {
           path: "/app/matches/:matchid/games/:gameid",

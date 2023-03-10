@@ -6,7 +6,6 @@ export default {
     return {
       matches: () => ({
         list: () => `${appUrl}/matches`,
-        get: (matchId: string) => `${appUrl}/matches/${matchId}`,
         games: (matchId: string) => {
           const matchUrl = `${appUrl}/matches/${matchId}`;
           return {
