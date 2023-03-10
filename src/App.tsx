@@ -56,9 +56,7 @@ function App() {
   return (
     <RealmAppProvider appId={appId}>
       <div className="App">
-        <Layout>
-          <RouterProvider router={router} />
-        </Layout>
+        <RouterProvider router={router} />
       </div>
     </RealmAppProvider>
   );

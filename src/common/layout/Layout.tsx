@@ -10,14 +10,7 @@ const Layout = ({ children }: PropsWithChildren) => {
     redirect(urls.login());
   }
 
-  return (
-    <div className="auth-page">
-      <nav>
-        <h1>tablerunner</h1>
-      </nav>
-      {children}
-    </div>
-  );
+  return <div>{children}</div>;
 };
 
 export default Layout;
