@@ -33,19 +33,15 @@ const Form = styled.form`
   color: black;
 `;
 
+const LogoutButton = () => {
+  const realmApp = useRealmApp();
+  return <button onClick={async () => await realmApp.logOut()}>Logout</button>;
+};
+
 const AuthPage = ({ isLogin }: OwnProps) => {
   const [error, setError] = React.useState("");
-
   const navigate = useNavigate();
-
   const realmApp = useRealmApp();
-  if (realmApp.currentUser) {
-    return (
-      <button onClick={async () => await realmApp.logOut()}>
-        You are currently signed in. Click to logout.
-      </button>
-    );
-  }
 
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");

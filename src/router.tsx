@@ -9,11 +9,9 @@ import appConfig from "../realm.json";
 import MatchGames from "./pages/match-games/MatchGames";
 import Matches from "./pages/matches/Matches";
 
-import "./App.css";
-
 const { appId } = appConfig;
 
-function App() {
+function Router() {
   const router = createBrowserRouter([
     {
       path: "/login",
@@ -54,11 +52,9 @@ function App() {
 
   return (
     <RealmAppProvider appId={appId}>
-      <div className="App">
-        <RouterProvider router={router} />
-      </div>
+      <RouterProvider router={router} />
     </RealmAppProvider>
   );
 }
 
-export default App;
+export default Router;
