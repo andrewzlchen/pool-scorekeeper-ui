@@ -55,7 +55,6 @@ const Matches = () => {
   const [playerStats, setPlayerStats] = React.useState<any>(null);
   const [isLoadingPlayerStats, setIsLoadingPlayerStats] = React.useState(true);
 
-
   // TODO: use useTeam()
   const mongo = currentUser.mongoClient('mongodb-atlas');
 
@@ -173,7 +172,6 @@ const Matches = () => {
 
   const isLoading = isLoadingPlayer || isLoadingPlayerStats || isLoadingTeamInfo;
 
-  // TODO add in ability to set name and keep track of W/L
   return isLoading ? undefined : (
     <Container className="w-4/5 max-w-md">
       <h1>{player ? player.name : 'Unnamed Pool Shark'}</h1>
