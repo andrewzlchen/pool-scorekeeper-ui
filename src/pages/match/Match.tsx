@@ -3,9 +3,7 @@ import styled from "@emotion/styled";
 import moment from "moment";
 
 import Divider from "../../common/divider/Divider";
-import { Team } from "../../common/types";
 import useTeamMatch from "../../hooks/useTeamMatch";
-import useGraphQL from "../../hooks/useGraphQL";
 
 const Container = styled.div`
   width: 80%;
@@ -20,19 +18,6 @@ const Card = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-`;
-
-const EmptyPlayerIcon = styled.div`
-  width: 40px;
-  height: 40px;
-  border-radius: 40px;
-  line-height: 40px;
-  vertical-align: middle;
-  font-size: 24px;
-  background-color: white;
-  color: black;
-  border: #d9d9d9 solid 1px;
-  text-align: center;
 `;
 
 const Match = () => {

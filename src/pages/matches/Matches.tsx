@@ -14,6 +14,7 @@ import Divider from "../../common/divider";
 import { useTeamByCurrentUser } from "../../hooks/useTeam";
 import usePlayer from "../../hooks/usePlayer";
 import usePlayerStats from "../../hooks/usePlayerStats";
+import divider from "../../common/divider";
 
 const Container = styled.div`
   justify-self: center;
@@ -111,9 +112,14 @@ const Matches = () => {
   }, []);
 
   const isLoading = playerLoading || teamLoading || playerStatsLoading;
-  return isLoading ? (
-    <>Loading...</>
-  ) : (
+  if (isLoading) {
+    <h1>Loading...</h1>;
+  }
+  if (!team) {
+    <div>{player ? player.name : "Unnamed Pool Shark"} is not on a team</div>;
+  }
+
+  return (
     <Container className="w-4/5 max-w-md">
       <h1>{player ? player.name : "Unnamed Pool Shark"}</h1>
       {playerStats && (
