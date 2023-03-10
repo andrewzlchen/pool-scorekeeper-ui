@@ -1,14 +1,17 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-import Auth from "./pages/auth";
-import Game from "./pages/game";
 import { RealmAppProvider } from "./hooks/useRealmApp";
 import { MatchContextProvider } from "./hooks/useMatch";
-import { GameType } from "./common/types";
-import appConfig from "../realm.json";
+import App from "./pages/app";
+import Auth from "./pages/auth";
+import NoPageFound from "./pages/no-page-found/NoPageFound";
 import MatchGames from "./pages/match-games/MatchGames";
 import Matches from "./pages/matches/Matches";
+import Game from "./pages/game";
 
+import { GameType } from "./common/types";
+
+import appConfig from "../realm.json";
 const { appId } = appConfig;
 
 function Router() {
@@ -22,31 +25,39 @@ function Router() {
       element: <Auth />,
     },
     {
-      path: "/matches",
-      element: <Matches />,
-    },
-    {
-      path: "/matches/:matchid/games",
+      path: "/app",
       element: (
         <MatchContextProvider>
-          <MatchGames />
+          <App />
         </MatchContextProvider>
       ),
+      children: [
+        {
+          path: "/app/matches",
+          element: <Matches />,
+        },
+        {
+          path: "/app/matches/:matchid/games",
+          element: <MatchGames />,
+        },
+        {
+          path: "/app/matches/:matchid/games/:gameid",
+          element: (
+            <Game
+              matchId="foobar"
+              gameSettings={{
+                gameType: GameType.EightBall,
+                playerA: { id: "1", name: "eren" },
+                playerB: { id: "2", name: "armin" },
+              }}
+            />
+          ),
+        },
+      ],
     },
     {
-      path: "/matches/:matchid/games/:gameid",
-      element: (
-        <MatchContextProvider>
-          <Game
-            matchId="foobar"
-            gameSettings={{
-              gameType: GameType.EightBall,
-              playerA: { id: "1", name: "eren" },
-              playerB: { id: "2", name: "armin" },
-            }}
-          />
-        </MatchContextProvider>
-      ),
+      path: "*",
+      element: <NoPageFound />,
     },
   ]);
 

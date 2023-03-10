@@ -56,7 +56,7 @@ const AuthPage = ({ isLogin }: OwnProps) => {
       }
 
       await realmApp.logIn(Realm.Credentials.emailPassword(email, password));
-      navigate(urls.matches().list());
+      navigate(urls.app().matches().list());
     } catch (err) {
       const error = err as Error;
       setError(`Failed to authenticate: ${error.message}`);
@@ -64,7 +64,7 @@ const AuthPage = ({ isLogin }: OwnProps) => {
   };
 
   return (
-    <Background>
+    <Background className="p-2">
       <div className="flex flex-col items-center w-4/5 max-w-md">
         <h1 className="font-header text-5xl mb-5">Hey Shark!</h1>
         <h2 className="mb-8">

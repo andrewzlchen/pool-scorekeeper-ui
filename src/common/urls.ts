@@ -1,12 +1,20 @@
 export default {
   login: () => "/login",
   signup: () => "/signup",
-  matches: () => ({
-    list: () => `/matches`,
-    get: (matchId: string) => `/matches/${matchId}`,
-    games: (matchId: string) => ({
-      list: () => `/matches/${matchId}/games`,
-      get: (gameId: string) => `/matches/${matchId}/games/${gameId}`,
-    }),
-  }),
+  app: () => {
+    const appUrl = `/app`;
+    return {
+      matches: () => ({
+        list: () => `${appUrl}/matches`,
+        get: (matchId: string) => `${appUrl}/matches/${matchId}`,
+        games: (matchId: string) => {
+          const matchUrl = `${appUrl}/matches/${matchId}`;
+          return {
+            list: () => `${matchUrl}/games`,
+            get: (gameId: string) => `${matchUrl}/games/${gameId}`,
+          };
+        },
+      }),
+    };
+  },
 };

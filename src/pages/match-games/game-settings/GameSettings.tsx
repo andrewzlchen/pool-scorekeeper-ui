@@ -52,7 +52,7 @@ const GameSettingsPage = ({ teamA, teamB }: Props) => {
     };
     setMatch(newMatch);
     if (match) {
-      navigate(urls.matches().games(match.id).list());
+      navigate(urls.app().matches().games(match.id).list());
     }
   };
 
