@@ -45,23 +45,64 @@ const Matches = () => {
 
   const navigate = useNavigate();
 
-  // TODO: use useTeam()
-  const mongo = currentUser.mongoClient('mongodb-atlas');
-  const teams = mongo.db('app').collection('teams');
-  const teamMatches = mongo.db('app').collection('team_matches');
-
   const [previousMatchups, setPreviousMatchups] = React.useState<any[]>([]);
   const [upcomingMatchups, setUpcomingMatchups] = React.useState<any[]>([]);
+  const [isLoadingTeamInfo, setIsLoadingTeamInfo] = React.useState(true);
+
+  const [player, setPlayer] = React.useState<any>(null);
+  const [isLoadingPlayer, setIsLoadingPlayer] = React.useState(true);
+
+  const [playerStats, setPlayerStats] = React.useState<any>(null);
+  const [isLoadingPlayerStats, setIsLoadingPlayerStats] = React.useState(true);
+
+
+  // TODO: use useTeam()
+  const mongo = currentUser.mongoClient('mongodb-atlas');
+
+  const teamsCol = mongo.db('app').collection('teams');
+  const teamMatchesCol = mongo.db('app').collection('team_matches');
+  const playerStatsCol = mongo.db('app').collection('player_stats');
+  const playersCol = mongo.db('app').collection('players');
 
   const fetchTeamDataForCurrentUser = async () => {
-    return await teams.findOne({ "players": new ObjectId(currentUser.id) });
-  }
+    return await teamsCol.findOne({ "players": new ObjectId(currentUser.id) });
+  };
 
   const fetchTeamMatchupsForTeam = async (teamName: string) => {
-    return await teamMatches.find({ "$or": [{"team1": teamName}, {"team2": teamName}] });
-  }
+    return await teamMatchesCol.find({ "$or": [{"team1": teamName}, {"team2": teamName}] });
+  };
+
+  const fetchPlayerForCurrentUser = async () => {
+    return await playersCol.findOne({ "_id": new ObjectId(currentUser.id) });
+  };
+
+  const fetchPlayerStatsForCurrentUser = async () => {
+    return await playerStatsCol.findOne({ "player": new ObjectId(currentUser.id) });
+  };
 
   React.useEffect(() => {
+    fetchPlayerForCurrentUser()
+      .then((playerRes) => {
+        setPlayer(playerRes);
+      })
+      .catch((e) => {
+        console.log(e.message);
+      })
+      .finally(() => {
+        setIsLoadingPlayer(false);
+      });
+
+    fetchPlayerStatsForCurrentUser()
+      .then((playerStatsRes) => {
+        setPlayerStats(playerStatsRes);
+      })
+      .catch((e) => {
+        console.log(e.message);
+      })
+      .finally(() => {
+        setIsLoadingPlayerStats(false);
+      });
+
     fetchTeamDataForCurrentUser()
       .then((team) => {
         if (team) {
@@ -91,7 +132,10 @@ const Matches = () => {
       .catch((e) => {
         console.log(e.message);
       })
-  }, [])
+      .finally(() => {
+        setIsLoadingTeamInfo(false);
+      });
+  }, []);
 
   const getUpcomingMatches = () => {
     return upcomingMatchups.map((match) => {
@@ -127,11 +171,13 @@ const Matches = () => {
     });
   }
 
+  const isLoading = isLoadingPlayer || isLoadingPlayerStats || isLoadingTeamInfo;
+
   // TODO add in ability to set name and keep track of W/L
-  return (
+  return isLoading ? undefined : (
     <Container className="w-4/5 max-w-md">
-      <h1>Andrew C.</h1>
-      <h3>Rank 4 • 3 Wins • 1 Loss</h3>
+      <h1>{player ? player.name : 'Unnamed Pool Shark'}</h1>
+      {playerStats && (<h3>{playerStats.overall.wins} Wins • {playerStats.overall.losses} Loss</h3>)}
       <button
         className="btn btn-accent"
         onClick={async () => {
